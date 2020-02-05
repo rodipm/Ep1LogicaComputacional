@@ -39,7 +39,7 @@ A representação do grafo nada mais é do que uma lista contendo seus respectiv
 Suponha um grafo com 4 nós, sendo '0' a raíz, '1' e '2' os nós-filhos de '0' e '3' o nó-filho de '1':
 
   0 --> 1 --> 3
-  \--> 2
+  |--> 2
 
 A representação deste grafo seria: ``` [{0, [1,2]}, {1, [3]}, {2, []}, {3, []}] ```
 
