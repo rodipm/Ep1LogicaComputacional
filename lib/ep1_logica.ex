@@ -1,38 +1,45 @@
 defmodule Ep1Logica do
-  def generate_paths(nodes) do
-    Enum.map(nodes, fn({node, _}) ->
-      visit(node, nodes, [])
+  @type graph_node :: {integer, [integer, ...]}
+  @type graph :: [graph_node, ...]
+  @type path  :: [integer, ...]
+
+  # Recebe um grafo e retorna todos os caminhos atingíveis a partir de todos os nós
+  def generate_paths(graph) do
+    Enum.map(graph, fn {node_number, _} ->
+      visit(node_number, graph, [])
     end)
   end
 
-  defp visit(node, nodes, visited) do
-    {_, child_nodes} = Enum.at(nodes, node)
-    Enum.reduce(child_nodes, visited ++ [node], fn(n, acc) ->
-      visit_recur(n, nodes, acc)
+  # Visita todos os nós filhos do nó sendo analisado de forma recursiva 
+  defp visit(node_number, graph, visited) do
+    {_, child_nodes} = Enum.at(graph, node_number)
+
+    Enum.reduce(child_nodes, visited ++ [node_number], fn n, acc ->
+      case Enum.member?(acc, n) do
+        true -> acc
+        false -> visit(n, graph, acc)
+      end
     end)
   end
 
-  defp visit_recur(node, nodes, visited) do
-    case Enum.member?(visited, node) do
-      true  -> visited
-      false -> visit(node, nodes, visited)
-    end
-  end
-
+  # Gera os pares ordenados a partir das listas de nós visitados para cada um dos nós do grafo
   def create_pairs([root | nodes]) do
-    create_pairs(root, nodes, [{root,root}])
+    create_pairs(root, nodes, [{root, root}])
   end
+
   defp create_pairs(root, [current | nodes], pairs) do
     create_pairs(root, nodes, pairs ++ [{root, current}])
   end
+
   defp create_pairs(_, [], pairs) do
     pairs
   end
 
+  # Executa o algoritmo retornando o fecho transitivo-reflexivo da relação binária representada pelo grafo unidirecional
   def execute(graph) do
     graph
-    |> Ep1Logica.generate_paths
-    |> Enum.map(fn(path)-> Ep1Logica.create_pairs(path) end)
-    |> Enum.reduce(fn(pairs, acc) -> acc ++ pairs end)
+    |> Ep1Logica.generate_paths()
+    |> Enum.map(fn path -> Ep1Logica.create_pairs(path) end)
+    |> Enum.reduce(fn pairs, acc -> acc ++ pairs end)
   end
 end
